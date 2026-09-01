@@ -55,6 +55,11 @@ if [[ ! -d "$release_dir" ]]; then
   mv "$incoming_dir/repo" "$release_dir"
 fi
 
+# The installer uses a restrictive umask while handling the bridge token. The
+# release itself contains only public application files, so make it readable
+# and searchable by the non-root display service before activation.
+chmod -R a+rX "$release_dir"
+
 next_link="$INSTALL_ROOT/.current-next"
 ln -sfn "$release_dir" "$next_link"
 mv -Tf "$next_link" "$INSTALL_ROOT/current"
