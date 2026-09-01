@@ -1,8 +1,8 @@
 import { createHash } from "node:crypto";
 import { exactlyThreeThreadCards } from "./thread-view.mjs";
 
-export const EPAPER_WIDTH = 104;
-export const EPAPER_HEIGHT = 212;
+export const EPAPER_WIDTH = 122;
+export const EPAPER_HEIGHT = 250;
 export const EPAPER_BYTES_PER_ROW = Math.ceil(EPAPER_WIDTH / 8);
 export const EPAPER_PLANE_BYTES = EPAPER_BYTES_PER_ROW * EPAPER_HEIGHT;
 export const EPAPER_FRAME_BYTES = EPAPER_PLANE_BYTES * 2;
@@ -113,26 +113,26 @@ export function renderEpaperFrame(payload, now = Date.now()) {
   const cards = exactlyThreeThreadCards(payload?.threads);
   const state = payload?.offline ? "OFFLINE" : payload?.stale ? "STALE" : "ONLINE";
 
-  bitmap.text("CODEX", 4, 4, 2, 5);
-  bitmap.text("LOCAL", 68, 8, 1, 5);
-  bitmap.text(state, 4, 23, 1, 8);
-  bitmap.line(4, 32, 96);
-  color.line(4, 32, 96);
+  bitmap.text("CODEX", 7, 6, 2, 5);
+  bitmap.text("LOCAL", 88, 9, 1, 5);
+  bitmap.text(state, 7, 23, 1, 8);
+  bitmap.line(7, 32, 108);
+  color.line(7, 32, 108);
 
   cards.forEach((card, index) => {
-    const y = 37 + index * 50;
-    bitmap.box(4, y, 96, 45);
-    bitmap.text(String(index + 1).padStart(2, "0"), 8, y + 5, 1, 2);
-    bitmap.text(short(card.title, 13), 20, y + 5, 1, 13);
-    bitmap.text(short(card.summary, 15), 8, y + 18, 1, 15);
-    bitmap.text(statusLabel(card), 8, y + 32, 1, 7);
+    const y = 38 + index * 64;
+    bitmap.box(6, y, 110, 58);
+    bitmap.text(String(index + 1).padStart(2, "0"), 11, y + 7, 1, 2);
+    bitmap.text(short(card.title, 15), 27, y + 7, 1, 15);
+    bitmap.text(short(card.summary, 17), 11, y + 21, 1, 17);
+    bitmap.text(statusLabel(card), 11, y + 36, 1, 8);
     const age = card.updatedAt ? Math.max(0, Math.floor((now - Number(card.updatedAt) * 1000) / 60_000)) : null;
-    bitmap.text(age === null ? "NO TIME" : `${Math.min(age, 999)}M AGO`, 55, y + 32, 1, 8);
-    if (["active", "waiting", "error"].includes(card.status)) color.line(4, y, 2, 45);
+    bitmap.text(age === null ? "NO TIME" : `${Math.min(age, 999)}M AGO`, 66, y + 36, 1, 8);
+    if (["active", "waiting", "error"].includes(card.status)) color.line(6, y, 2, 58);
   });
 
-  bitmap.line(4, 187, 96);
-  bitmap.text("READ ONLY", 7, 195, 1, 9);
+  bitmap.line(7, 230, 108);
+  bitmap.text("LOCAL / READ ONLY", 9, 237, 1, 18);
   return Buffer.concat([bitmap.data, color.data]);
 }
 

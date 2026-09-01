@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <SPI.h>
-#include <GxEPD2_3C.h>
+#include <GxEPD2_4C.h>
 
 // Waveshare E-Paper ESP32 Driver Board mapping.
 // The board routes the panel through HSPI with SCK and MOSI remapped.
@@ -12,8 +12,8 @@ constexpr int EPD_SCK = 13;
 constexpr int EPD_MISO = 12;
 constexpr int EPD_MOSI = 14;
 
-constexpr uint16_t FRAME_WIDTH = 104;
-constexpr uint16_t FRAME_HEIGHT = 212;
+constexpr uint16_t FRAME_WIDTH = 122;
+constexpr uint16_t FRAME_HEIGHT = 250;
 constexpr uint16_t FRAME_BYTES_PER_ROW = (FRAME_WIDTH + 7) / 8;
 constexpr uint32_t PLANE_BYTES = FRAME_BYTES_PER_ROW * FRAME_HEIGHT;
 constexpr uint32_t FRAME_BYTES = PLANE_BYTES * 2;
@@ -21,8 +21,8 @@ constexpr uint32_t FRAME_TIMEOUT_MS = 10000;
 constexpr size_t HEADER_CAPACITY = 32;
 
 SPIClass hspi(HSPI);
-GxEPD2_3C<GxEPD2_213_Z19c, GxEPD2_213_Z19c::HEIGHT> display(
-    GxEPD2_213_Z19c(EPD_CS, EPD_DC, EPD_RST, EPD_BUSY));
+GxEPD2_4C<GxEPD2_213c_GDEY0213F51, GxEPD2_213c_GDEY0213F51::HEIGHT> display(
+    GxEPD2_213c_GDEY0213F51(EPD_CS, EPD_DC, EPD_RST, EPD_BUSY));
 uint8_t frame[FRAME_BYTES];
 
 void reply(const char *message) {
@@ -38,7 +38,7 @@ void displayFrame() {
   do {
     display.fillScreen(GxEPD_WHITE);
     display.drawBitmap(0, 0, frame, FRAME_WIDTH, FRAME_HEIGHT, GxEPD_BLACK);
-    display.drawBitmap(0, 0, frame + PLANE_BYTES, FRAME_WIDTH, FRAME_HEIGHT, GxEPD_RED);
+    display.drawBitmap(0, 0, frame + PLANE_BYTES, FRAME_WIDTH, FRAME_HEIGHT, GxEPD_YELLOW);
   } while (display.nextPage());
   display.powerOff();
 }
@@ -63,7 +63,7 @@ bool parseHeader(char *header, uint32_t *length) {
   unsigned long parsedLength = 0;
   char version[8] = {0};
   if (sscanf(header, "%7s %lu", version, &parsedLength) != 2) return false;
-  if (strcmp(version, "CCEP/2") != 0 || parsedLength != FRAME_BYTES) return false;
+  if (strcmp(version, "CCEP/3") != 0 || parsedLength != FRAME_BYTES) return false;
   *length = static_cast<uint32_t>(parsedLength);
   return true;
 }
@@ -72,7 +72,7 @@ void setup() {
   Serial.begin(115200);
   hspi.begin(EPD_SCK, EPD_MISO, EPD_MOSI, EPD_CS);
   display.epd2.selectSPI(hspi, SPISettings(4000000, MSBFIRST, SPI_MODE0));
-  reply("CCEP READY 2 104x212 3C");
+  reply("CCEP READY 3 122x250 4C");
 }
 
 void loop() {

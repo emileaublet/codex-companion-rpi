@@ -5,7 +5,7 @@ import { EPAPER_FRAME_BYTES, frameDigest, renderEpaperFrame } from "../../packag
 const companionUrl = (process.env.COMPANION_URL || "http://127.0.0.1:4173").replace(/\/$/, "");
 const devicePath = process.env.EPAPER_SERIAL_DEVICE || "/dev/ttyACM0";
 const intervalMs = Math.max(30_000, Number(process.env.EPAPER_UPDATE_INTERVAL_MS || 60_000));
-const protocolVersion = "CCEP/2";
+const protocolVersion = "CCEP/3";
 let serial;
 let lastDigest = "";
 
@@ -32,7 +32,7 @@ async function sendFrame(frame) {
 
   const responseBuffer = Buffer.alloc(128);
   let response = "";
-  const deadline = Date.now() + 30_000;
+  const deadline = Date.now() + 35_000;
   while (Date.now() < deadline) {
     const result = await handle.read(responseBuffer, 0, responseBuffer.length, null);
     if (result.bytesRead > 0) {

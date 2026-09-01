@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { EPAPER_FRAME_BYTES, frameDigest, renderEpaperFrame } from "../packages/epaper-frame.mjs";
 
-test("ePaper renderer creates a fixed-size two-plane color frame", () => {
+test("ePaper renderer creates a fixed-size two-plane four-color frame", () => {
   const frame = renderEpaperFrame({
     threads: [
       { id: "1", title: "First thread", summary: "A safe summary", status: "active", updatedAt: 1788270000 },
@@ -11,7 +11,7 @@ test("ePaper renderer creates a fixed-size two-plane color frame", () => {
     ]
   });
   assert.equal(frame.length, EPAPER_FRAME_BYTES);
-  assert.equal(EPAPER_FRAME_BYTES, 5512);
+  assert.equal(EPAPER_FRAME_BYTES, 8000);
   assert.notEqual(frameDigest(frame), frameDigest(Buffer.alloc(EPAPER_FRAME_BYTES)));
 });
 

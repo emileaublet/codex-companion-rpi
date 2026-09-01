@@ -31,7 +31,7 @@ The Pi and Mac should also be members of the same Tailscale tailnet. Use the Pi'
 
 The optional ePaper path uses the connected Waveshare E-Paper ESP32 Driver
 Board as a USB-serial display peripheral. The Pi renders a compact portrait
-snapshot locally and sends a two-plane 104×212 three-color bitmap only when it changes.
+snapshot locally and sends two one-bit 122×250 planes for the four-color panel only when it changes.
 It does not send the bridge token or raw API payload to the ESP32, and it does
 not require Wi-Fi credentials on the board. The ePaper is intentionally static
 and refreshes at most once per minute; the animated companion remains on the
@@ -80,7 +80,7 @@ The installer stores the token at `/etc/codex-companion/bridge.token`, owned by 
 
 ### ePaper firmware
 
-The connected tag's yellow/white/black refresh behavior indicates a three-color 2.13-inch panel rather than the previously selected black-and-white profile. The firmware now uses the `GxEPD2_213_Z19c` UC8151D profile (104×212 native pixels) and sends separate black and accent-color planes. The exact panel marking is not fully legible, so if the panel still does not render after this profile change, stop and identify the FPC/controller before trying another profile. The firmware source and PlatformIO project are in `firmware/epaper-esp32/`; its display pin mapping follows the Waveshare ESP32 Driver Board and the GxEPD2 Waveshare example. Build and upload it from a machine with PlatformIO:
+The connected tag's yellow/white/black refresh behavior indicates the four-color 2.13-inch G variant. The firmware uses the `GxEPD2_213c_GDEY0213F51` / JD79661 profile (122×250 native pixels) and sends separate black and yellow planes. The exact panel marking is not fully legible, so if the panel still does not render after this profile change, stop and identify the FPC/controller before trying another profile. The firmware source and PlatformIO project are in `firmware/epaper-esp32/`; its display pin mapping follows the Waveshare ESP32 Driver Board and the GxEPD2 Waveshare example. Build and upload it from a machine with PlatformIO:
 
 ```bash
 cd firmware/epaper-esp32

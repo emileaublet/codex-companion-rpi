@@ -1,15 +1,15 @@
 # Codex Companion ePaper firmware
 
 This firmware targets the Waveshare E-Paper ESP32 Driver Board connected to the
-three-color 2.13-inch panel in the project setup. The selected
-`GxEPD2_213_Z19c` profile uses the UC8151D controller and 104×212 native
-pixels. It drives the panel on the board's remapped HSPI pins and accepts two
-one-bit planes over USB serial: black, followed by the red/yellow accent plane.
+four-color 2.13-inch panel in the project setup. The selected
+`GxEPD2_213c_GDEY0213F51` profile uses the JD79661 controller and 122×250
+native pixels. It drives the panel on the board's remapped HSPI pins and
+accepts two one-bit planes over USB serial: black, followed by yellow.
 
 Protocol:
 
 ```text
-CCEP/2 5512\n<2756 black bytes followed by 2756 accent-color bytes>
+CCEP/3 8000\n<4000 black bytes followed by 4000 yellow bytes>
 ```
 
 The USB serial device is normally `/dev/ttyACM0` on Raspberry Pi OS. The Pi
