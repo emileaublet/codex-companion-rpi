@@ -5,7 +5,8 @@ export const EPAPER_WIDTH = 122;
 export const EPAPER_HEIGHT = 250;
 export const EPAPER_BYTES_PER_ROW = Math.ceil(EPAPER_WIDTH / 8);
 export const EPAPER_PLANE_BYTES = EPAPER_BYTES_PER_ROW * EPAPER_HEIGHT;
-export const EPAPER_FRAME_BYTES = EPAPER_PLANE_BYTES * 2;
+export const EPAPER_NATIVE_BYTES_PER_ROW = Math.ceil(128 / 4);
+export const EPAPER_FRAME_BYTES = EPAPER_NATIVE_BYTES_PER_ROW * EPAPER_HEIGHT;
 
 const GLYPHS = {
   " ": ["00000", "00000", "00000", "00000", "00000", "00000", "00000"],
@@ -133,7 +134,18 @@ export function renderEpaperFrame(payload, now = Date.now()) {
 
   bitmap.line(7, 230, 108);
   bitmap.text("LOCAL / READ ONLY", 9, 237, 1, 18);
-  return Buffer.concat([bitmap.data, color.data]);
+  const native = Buffer.alloc(EPAPER_FRAME_BYTES, 0x55); // four white pixels per byte
+  for (let y = 0; y < EPAPER_HEIGHT; y += 1) {
+    for (let x = 0; x < EPAPER_WIDTH; x += 1) {
+      const sourceOffset = y * EPAPER_BYTES_PER_ROW + Math.floor(x / 8);
+      const bit = 0x80 >> (x % 8);
+      const pixel = color.data[sourceOffset] & bit ? 0x02 : bitmap.data[sourceOffset] & bit ? 0x00 : 0x01;
+      const nativeOffset = y * EPAPER_NATIVE_BYTES_PER_ROW + Math.floor(x / 4);
+      const shift = (3 - (x % 4)) * 2;
+      native[nativeOffset] = (native[nativeOffset] & ~(0x03 << shift)) | (pixel << shift);
+    }
+  }
+  return native;
 }
 
 export function frameDigest(frame) {

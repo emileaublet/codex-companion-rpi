@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { EPAPER_FRAME_BYTES, frameDigest, renderEpaperFrame } from "../packages/epaper-frame.mjs";
 
-test("ePaper renderer creates a fixed-size two-plane four-color frame", () => {
+test("ePaper renderer creates a fixed-size native four-color frame", () => {
   const frame = renderEpaperFrame({
     threads: [
       { id: "1", title: "First thread", summary: "A safe summary", status: "active", updatedAt: 1788270000 },

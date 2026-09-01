@@ -12,7 +12,7 @@ constexpr int EPD_SCK = 13;
 constexpr int EPD_MISO = 12;
 constexpr int EPD_MOSI = 14;
 
-constexpr uint16_t FRAME_WIDTH = 122;
+constexpr uint16_t FRAME_WIDTH = 128;
 constexpr uint16_t FRAME_HEIGHT = 250;
 constexpr uint16_t FRAME_BYTES_PER_ROW = (FRAME_WIDTH + 7) / 8;
 constexpr uint32_t PLANE_BYTES = FRAME_BYTES_PER_ROW * FRAME_HEIGHT;
@@ -32,15 +32,9 @@ void reply(const char *message) {
 
 void displayFrame() {
   display.init();
-  display.setRotation(0);
-  display.setFullWindow();
-  display.firstPage();
-  do {
-    display.fillScreen(GxEPD_WHITE);
-    display.drawBitmap(0, 0, frame, FRAME_WIDTH, FRAME_HEIGHT, GxEPD_BLACK);
-    display.drawBitmap(0, 0, frame + PLANE_BYTES, FRAME_WIDTH, FRAME_HEIGHT, GxEPD_YELLOW);
-  } while (display.nextPage());
-  display.powerOff();
+  display.epd2.writeNative(frame, nullptr, 0, 0, FRAME_WIDTH, FRAME_HEIGHT, false, false, false);
+  display.epd2.refresh(false);
+  display.epd2.powerOff();
 }
 
 bool readFrame(uint32_t length) {
@@ -72,7 +66,7 @@ void setup() {
   Serial.begin(115200);
   hspi.begin(EPD_SCK, EPD_MISO, EPD_MOSI, EPD_CS);
   display.epd2.selectSPI(hspi, SPISettings(4000000, MSBFIRST, SPI_MODE0));
-  reply("CCEP READY 3 122x250 4C");
+  reply("CCEP READY 4 122x250 4C-NATIVE");
 }
 
 void loop() {

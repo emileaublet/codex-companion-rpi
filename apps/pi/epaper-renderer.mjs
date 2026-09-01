@@ -5,7 +5,7 @@ import { EPAPER_FRAME_BYTES, frameDigest, renderEpaperFrame } from "../../packag
 const companionUrl = (process.env.COMPANION_URL || "http://127.0.0.1:4173").replace(/\/$/, "");
 const devicePath = process.env.EPAPER_SERIAL_DEVICE || "/dev/ttyACM0";
 const intervalMs = Math.max(30_000, Number(process.env.EPAPER_UPDATE_INTERVAL_MS || 60_000));
-const protocolVersion = "CCEP/3";
+const protocolVersion = "CCEP/4";
 let serial;
 let lastDigest = "";
 
