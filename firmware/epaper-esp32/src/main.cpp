@@ -14,9 +14,8 @@ constexpr int EPD_MOSI = 14;
 
 constexpr uint16_t FRAME_WIDTH = 128;
 constexpr uint16_t FRAME_HEIGHT = 250;
-constexpr uint16_t FRAME_BYTES_PER_ROW = (FRAME_WIDTH + 7) / 8;
-constexpr uint32_t PLANE_BYTES = FRAME_BYTES_PER_ROW * FRAME_HEIGHT;
-constexpr uint32_t FRAME_BYTES = PLANE_BYTES * 2;
+constexpr uint16_t FRAME_BYTES_PER_ROW = FRAME_WIDTH / 4;
+constexpr uint32_t FRAME_BYTES = FRAME_BYTES_PER_ROW * FRAME_HEIGHT;
 constexpr uint32_t FRAME_TIMEOUT_MS = 10000;
 constexpr size_t HEADER_CAPACITY = 32;
 
