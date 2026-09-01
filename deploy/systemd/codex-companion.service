@@ -1,0 +1,21 @@
+[Unit]
+Description=Aublet Codex Companion display server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=__COMPANION_USER__
+WorkingDirectory=/opt/codex-companion/current
+EnvironmentFile=/etc/codex-companion/pi.env
+ExecStart=__NODE_BIN__ apps/pi/server.mjs
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/tmp
+
+[Install]
+WantedBy=multi-user.target

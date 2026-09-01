@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="theme-color" content="#101214" />
+    <title>Codex Companion</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="companion" aria-label="Companion status">
+        <div class="pet-wrap" id="pet" data-state="idle" aria-hidden="true">
+          <div class="signal signal-one"></div>
+          <div class="signal signal-two"></div>
+          <svg class="pet" viewBox="0 0 180 180" role="img">
+            <path class="body" d="M45 127C28 106 31 70 51 49c18-20 54-24 77-6 22 17 30 52 16 79-13 26-38 35-64 29-15-3-27-11-35-24Z" />
+            <path class="ear left-ear" d="m49 57-8-31 30 19" />
+            <path class="ear right-ear" d="m117 43 24-20-1 37" />
+            <g class="face">
+              <ellipse class="eye left" cx="72" cy="87" rx="7" ry="9" />
+              <ellipse class="eye right" cx="113" cy="87" rx="7" ry="9" />
+              <path class="mouth" d="M79 112c8 7 18 7 27 0" />
+            </g>
+            <path class="tail" d="M140 120c26-2 27 24 11 27" />
+          </svg>
+        </div>
+        <div class="pet-copy">
+          <p class="eyebrow">CODEX COMPANION</p>
+          <h1 id="pet-message">Catching up…</h1>
+          <p class="connection"><span id="connection-dot"></span><span id="connection-label">Connecting</span></p>
+        </div>
+      </section>
+
+      <section class="threads" aria-live="polite" aria-label="Recent Codex threads">
+        <header>
+          <h2>Recent</h2>
+          <time id="last-refresh">—</time>
+        </header>
+        <div id="thread-list" class="thread-list">
+          <article class="thread-card skeleton"></article>
+          <article class="thread-card skeleton"></article>
+          <article class="thread-card skeleton"></article>
+        </div>
+      </section>
+    </main>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

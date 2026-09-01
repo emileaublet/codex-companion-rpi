@@ -1,0 +1,17 @@
+{
+  "name": "codex-companion-mvp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A Raspberry Pi kiosk companion for recent Codex threads.",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev:pi": "MOCK_MODE=1 node apps/pi/server.mjs",
+    "dev:bridge": "node apps/mac-bridge/server.mjs",
+    "test": "node --test",
+    "verify": "node scripts/verify.mjs"
+  },
+  "license": "MIT"
+}

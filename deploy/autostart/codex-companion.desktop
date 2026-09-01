@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Codex Companion Kiosk
+Exec=/opt/codex-companion/current/scripts/launch-kiosk.sh
+Terminal=false
+X-GNOME-Autostart-enabled=true

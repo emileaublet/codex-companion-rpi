@@ -1,0 +1,8 @@
+[Unit]
+Description=Update Aublet Codex Companion from GitHub
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/codex-companion/current/scripts/update.sh

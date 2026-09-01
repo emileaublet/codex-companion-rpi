@@ -1,0 +1,27 @@
+{
+  "threads": [
+    {
+      "id": "demo-1",
+      "title": "Physical Codex companion",
+      "summary": "Scaffolding a Raspberry Pi kiosk, Mac bridge and automatic updater.",
+      "updatedAt": 1788267600,
+      "status": "active"
+    },
+    {
+      "id": "demo-2",
+      "title": "Aublet Atelier content plan",
+      "summary": "Refining upcoming videos, descriptions and calls to action.",
+      "updatedAt": 1788264000,
+      "status": "idle"
+    },
+    {
+      "id": "demo-3",
+      "title": "Plotter controller research",
+      "summary": "Comparing FluidNC boards for the XYYZ pen plotter configuration.",
+      "updatedAt": 1788256800,
+      "status": "idle"
+    }
+  ],
+  "source": "mock",
+  "refreshedAt": "2026-09-01T12:00:00.000Z"
+}
