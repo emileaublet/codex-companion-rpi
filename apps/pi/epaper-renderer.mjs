@@ -10,7 +10,7 @@ let serial;
 let lastDigest = "";
 
 function configureSerial() {
-  const result = spawnSync("stty", ["-F", devicePath, "115200", "raw", "-echo", "-ixon", "-ixoff"], { encoding: "utf8" });
+  const result = spawnSync("stty", ["-F", devicePath, "115200", "raw", "-echo", "-ixon", "-ixoff", "min", "0", "time", "1"], { encoding: "utf8" });
   if (result.status !== 0) throw new Error("serial configuration failed");
 }
 
@@ -29,6 +29,20 @@ async function sendFrame(frame) {
   const header = Buffer.from(`${protocolVersion} ${frame.length}\n`, "ascii");
   await handle.write(header);
   await handle.write(frame);
+
+  const responseBuffer = Buffer.alloc(128);
+  let response = "";
+  const deadline = Date.now() + 15_000;
+  while (Date.now() < deadline) {
+    const result = await handle.read(responseBuffer, 0, responseBuffer.length, null);
+    if (result.bytesRead > 0) {
+      response += responseBuffer.subarray(0, result.bytesRead).toString("ascii");
+      if (response.includes("CCEP OK")) return;
+      if (response.includes("CCEP ERR")) throw new Error("ePaper rejected frame");
+    }
+    await new Promise((resolve) => setTimeout(resolve, 25));
+  }
+  throw new Error("ePaper acknowledgement timeout");
 }
 
 async function fetchPayload() {
