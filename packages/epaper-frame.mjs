@@ -100,6 +100,21 @@ class Bitmap {
   }
 }
 
+function rotate180(data) {
+  const rotated = Buffer.alloc(EPAPER_PLANE_BYTES, 0xff);
+  for (let y = 0; y < EPAPER_HEIGHT; y += 1) {
+    for (let x = 0; x < EPAPER_WIDTH; x += 1) {
+      const sourceOffset = y * EPAPER_BYTES_PER_ROW + Math.floor(x / 8);
+      if ((data[sourceOffset] & (0x80 >> (x % 8))) !== 0) continue;
+      const targetX = EPAPER_WIDTH - 1 - x;
+      const targetY = EPAPER_HEIGHT - 1 - y;
+      const targetOffset = targetY * EPAPER_BYTES_PER_ROW + Math.floor(targetX / 8);
+      rotated[targetOffset] &= ~(0x80 >> (targetX % 8));
+    }
+  }
+  return rotated;
+}
+
 function short(value, length) {
   const text = String(value || "").replace(/\s+/g, " ").trim().toUpperCase();
   return text.length > length ? `${text.slice(0, Math.max(0, length - 1))}…` : text;
@@ -138,7 +153,7 @@ export function renderEpaperFrame(payload, now = Date.now()) {
   // The confirmed 2.13 B V4 panel uses two active-low 1-bit planes: black
   // followed by yellow. The controller expects 128 pixels per row, so each
   // 122-pixel row is already padded by the 16-byte bitmap stride.
-  return Buffer.concat([bitmap.data, color.data]);
+  return Buffer.concat([rotate180(bitmap.data), rotate180(color.data)]);
 }
 
 export function frameDigest(frame) {
