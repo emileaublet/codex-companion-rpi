@@ -31,7 +31,7 @@ void reply(const char *message) {
 }
 
 void displayFrame() {
-  display.init(115200);
+  display.init();
   display.setRotation(0);
   display.setFullWindow();
   display.firstPage();

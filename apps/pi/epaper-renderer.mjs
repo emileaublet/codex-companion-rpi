@@ -32,7 +32,7 @@ async function sendFrame(frame) {
 
   const responseBuffer = Buffer.alloc(128);
   let response = "";
-  const deadline = Date.now() + 35_000;
+  const deadline = Date.now() + 60_000;
   while (Date.now() < deadline) {
     const result = await handle.read(responseBuffer, 0, responseBuffer.length, null);
     if (result.bytesRead > 0) {
