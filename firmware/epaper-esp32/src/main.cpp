@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <SPI.h>
-#include <GxEPD2_4C.h>
+#include <GxEPD2_3C.h>
 
 // Waveshare E-Paper ESP32 Driver Board mapping.
 // The board routes the panel through HSPI with SCK and MOSI remapped.
@@ -14,14 +14,15 @@ constexpr int EPD_MOSI = 14;
 
 constexpr uint16_t FRAME_WIDTH = 128;
 constexpr uint16_t FRAME_HEIGHT = 250;
-constexpr uint16_t FRAME_BYTES_PER_ROW = FRAME_WIDTH / 4;
-constexpr uint32_t FRAME_BYTES = FRAME_BYTES_PER_ROW * FRAME_HEIGHT;
+constexpr uint16_t FRAME_BYTES_PER_ROW = FRAME_WIDTH / 8;
+constexpr uint32_t FRAME_PLANE_BYTES = FRAME_BYTES_PER_ROW * FRAME_HEIGHT;
+constexpr uint32_t FRAME_BYTES = FRAME_PLANE_BYTES * 2;
 constexpr uint32_t FRAME_TIMEOUT_MS = 10000;
 constexpr size_t HEADER_CAPACITY = 32;
 
 SPIClass hspi(HSPI);
-GxEPD2_4C<GxEPD2_213c_GDEY0213F51, GxEPD2_213c_GDEY0213F51::HEIGHT> display(
-    GxEPD2_213c_GDEY0213F51(EPD_CS, EPD_DC, EPD_RST, EPD_BUSY));
+GxEPD2_3C<GxEPD2_213_Z98c, GxEPD2_213_Z98c::HEIGHT> display(
+    GxEPD2_213_Z98c(EPD_CS, EPD_DC, EPD_RST, EPD_BUSY));
 uint8_t frame[FRAME_BYTES];
 
 void reply(const char *message) {
@@ -31,7 +32,7 @@ void reply(const char *message) {
 
 void displayFrame() {
   display.init();
-  display.epd2.writeNative(frame, nullptr, 0, 0, FRAME_WIDTH, FRAME_HEIGHT, false, false, false);
+  display.epd2.writeImage(frame, frame + FRAME_PLANE_BYTES, 0, 0, FRAME_WIDTH, FRAME_HEIGHT, false, false, false);
   display.epd2.refresh(false);
   display.epd2.powerOff();
 }
@@ -56,7 +57,7 @@ bool parseHeader(char *header, uint32_t *length) {
   unsigned long parsedLength = 0;
   char version[8] = {0};
   if (sscanf(header, "%7s %lu", version, &parsedLength) != 2) return false;
-  if (strcmp(version, "CCEP/4") != 0 || parsedLength != FRAME_BYTES) return false;
+  if (strcmp(version, "CCEP/5") != 0 || parsedLength != FRAME_BYTES) return false;
   *length = static_cast<uint32_t>(parsedLength);
   return true;
 }
@@ -65,7 +66,7 @@ void setup() {
   Serial.begin(115200);
   hspi.begin(EPD_SCK, EPD_MISO, EPD_MOSI, EPD_CS);
   display.epd2.selectSPI(hspi, SPISettings(4000000, MSBFIRST, SPI_MODE0));
-  reply("CCEP READY 4 122x250 4C-NATIVE");
+  reply("CCEP READY 5 122x250 2-PLANE");
 }
 
 void loop() {
