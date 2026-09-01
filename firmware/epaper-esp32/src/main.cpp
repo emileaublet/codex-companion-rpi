@@ -56,7 +56,7 @@ bool parseHeader(char *header, uint32_t *length) {
   unsigned long parsedLength = 0;
   char version[8] = {0};
   if (sscanf(header, "%7s %lu", version, &parsedLength) != 2) return false;
-  if (strcmp(version, "CCEP/3") != 0 || parsedLength != FRAME_BYTES) return false;
+  if (strcmp(version, "CCEP/4") != 0 || parsedLength != FRAME_BYTES) return false;
   *length = static_cast<uint32_t>(parsedLength);
   return true;
 }
