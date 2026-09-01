@@ -15,6 +15,8 @@ flowchart LR
 
 The default deployment target is a Pi named `codex-companion.local`, using SSH user `admin`, on the same trusted home network as the Mac. The kiosk is designed for a small landscape display; verification uses a 1024x600 viewport. The layout also adapts to portrait and larger screens.
 
+The Pi and Mac should also be members of the same Tailscale tailnet. Use the Pi's Tailscale address or MagicDNS name for ongoing administration and use the Mac's Tailscale address in `--bridge-url`, for example `http://100.x.y.z:4174`. The display server remains bound to Pi loopback; only the Mac bridge is reached over the tailnet.
+
 ## What it shows
 
 - Idle, active, waiting-for-approval, and offline companion animations.
@@ -71,6 +73,16 @@ The Pi service listens only on `127.0.0.1:4173`; Chromium accesses it locally. T
 The updater checks the configured GitHub branch every 15 minutes. It clones a fresh snapshot into a temporary release directory, runs strict Git validation plus the full verification suite, then switches the `current` symlink atomically. The active service is restarted only after activation. Previous releases remain available for rollback. A reboot occurs only when an activated release contains `deploy/REBOOT_REQUIRED`.
 
 The Pi does not use a personal GitHub access token. Private repositories require a repository-scoped read-only deploy key configured separately; do not put that key or any personal token in the Pi image.
+
+Verify the tailnet path with:
+
+```bash
+tailscale status --peers=false
+tailscale ping codex-companion
+ssh admin@<pi-tailscale-ip>
+```
+
+Tailscale device authentication is performed outside this repository. Do not commit auth keys or copy them into the application configuration.
 
 ## Security boundaries
 
