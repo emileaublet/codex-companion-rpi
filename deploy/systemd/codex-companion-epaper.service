@@ -1,0 +1,22 @@
+[Unit]
+Description=Aublet Codex Companion ePaper renderer
+After=codex-companion.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=__COMPANION_USER__
+SupplementaryGroups=dialout
+WorkingDirectory=/opt/codex-companion/current
+EnvironmentFile=/etc/codex-companion/pi.env
+ExecStart=__NODE_BIN__ apps/pi/epaper-renderer.mjs
+Restart=always
+RestartSec=10
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/tmp
+
+[Install]
+WantedBy=multi-user.target

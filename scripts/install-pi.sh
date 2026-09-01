@@ -82,6 +82,7 @@ printf 'PORT=4173\nBRIDGE_URL=%s\nMOCK_MODE=0\n' \
   "$bridge_url" \
   > /etc/codex-companion/pi.env
 printf 'BRIDGE_TOKEN_FILE=/etc/codex-companion/bridge.token\n' >> /etc/codex-companion/pi.env
+printf 'EPAPER_SERIAL_DEVICE=/dev/ttyACM0\nEPAPER_UPDATE_INTERVAL_MS=60000\n' >> /etc/codex-companion/pi.env
 companion_group="$(id -gn "$companion_user")"
 umask 077
 printf '%s\n' "$bridge_token" > /etc/codex-companion/bridge.token
@@ -98,11 +99,27 @@ install -m 0644 /opt/codex-companion/current/deploy/systemd/codex-companion-upda
   /etc/systemd/system/codex-companion-update.service
 install -m 0644 /opt/codex-companion/current/deploy/systemd/codex-companion-update.timer \
   /etc/systemd/system/codex-companion-update.timer
+sed -e "s#__COMPANION_USER__#$companion_user#g" -e "s#__NODE_BIN__#$node_path#g" \
+  /opt/codex-companion/current/deploy/systemd/codex-companion-epaper.service \
+  > /etc/systemd/system/codex-companion-epaper.service
 install -m 0644 /opt/codex-companion/current/deploy/autostart/codex-companion.desktop \
   /etc/xdg/autostart/codex-companion.desktop
 
+# Raspberry Pi OS Desktop currently uses labwc. Keep the distro's existing
+# autostart commands intact, while also registering a native labwc entry so
+# kiosk startup does not depend on the XDG compatibility helper.
+labwc_autostart=/etc/xdg/labwc/autostart
+install -d -m 0755 /etc/xdg/labwc
+touch "$labwc_autostart"
+if ! grep -Fq '# codex-companion kiosk (managed)' "$labwc_autostart"; then
+  {
+    printf '\n# codex-companion kiosk (managed)\n'
+    printf '/usr/bin/lwrespawn /opt/codex-companion/current/scripts/launch-kiosk.sh >/tmp/codex-companion-kiosk.log 2>&1 &\n'
+  } >> "$labwc_autostart"
+fi
+
 systemctl daemon-reload
-systemctl enable --now codex-companion.service codex-companion-update.timer
+systemctl enable --now codex-companion.service codex-companion-epaper.service codex-companion-update.timer
 
 echo
 echo "Companion installed. Reboot into Raspberry Pi OS Desktop to enter kiosk mode."

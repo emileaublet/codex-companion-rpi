@@ -5,3 +5,4 @@ codex-companion-mvp.tar.gz
 *.log
 coverage/
 node_modules/
+.pio/

@@ -64,7 +64,7 @@ next_link="$INSTALL_ROOT/.current-next"
 ln -sfn "$release_dir" "$next_link"
 mv -Tf "$next_link" "$INSTALL_ROOT/current"
 
-systemctl try-restart codex-companion.service || true
+systemctl try-restart codex-companion.service codex-companion-epaper.service || true
 echo "Updated companion from ${old_sha:-none} to $new_sha."
 
 if [[ -f "$release_dir/deploy/REBOOT_REQUIRED" ]]; then

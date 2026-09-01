@@ -11,6 +11,10 @@ flowchart LR
   A[Codex app-server on Mac] --> B[Read-only authenticated Mac bridge]
   B --> C[Pi display server]
   C --> D[Chromium kiosk]
+  C --> E[Pi ePaper renderer]
+  E --> F[USB serial]
+  F --> G[ESP32 driver board]
+  G --> H[2.13-inch ePaper]
 ```
 
 The default deployment target is a Pi named `codex-companion.local`, using SSH user `admin`, on the same trusted home network as the Mac. The kiosk is designed for a small landscape display; verification uses a 1024x600 viewport. The layout also adapts to portrait and larger screens.
@@ -24,6 +28,14 @@ The Pi and Mac should also be members of the same Tailscale tailnet. Use the Pi'
 - Sanitized title, preview, relative timestamp, and status.
 - Cached last-known activity while the Mac bridge is temporarily unavailable.
 - No touch actions: v0.1 is informational and read-only.
+
+The optional ePaper path uses the connected Waveshare E-Paper ESP32 Driver
+Board as a USB-serial display peripheral. The Pi renders a compact portrait
+snapshot locally and sends a 122×250 monochrome bitmap only when it changes.
+It does not send the bridge token or raw API payload to the ESP32, and it does
+not require Wi-Fi credentials on the board. The ePaper is intentionally static
+and refreshes at most once per minute; the animated companion remains on the
+Chromium display.
 
 ## Local preview and tests
 
@@ -64,7 +76,19 @@ sudo ./scripts/install-pi.sh \
   --user admin
 ```
 
-The installer stores the token at `/etc/codex-companion/bridge.token`, owned by `admin` with mode `0600`; it does not echo the token. It installs the display systemd service, the 15-minute update timer, and the Desktop autostart entry for Chromium kiosk mode.
+The installer stores the token at `/etc/codex-companion/bridge.token`, owned by `admin` with mode `0600`; it does not echo the token. It installs the display and ePaper renderer systemd services, the 15-minute update timer, and Chromium kiosk autostart entries for Raspberry Pi OS Desktop's labwc session and its XDG compatibility layer. The labwc entry supervises Chromium and the launcher uses a per-session lock to prevent duplicates. The ePaper renderer expects the board at `/dev/ttyACM0` and retries safely if it is disconnected.
+
+### ePaper firmware
+
+The attached tag is identified from its rear marking as a 2.13-inch black-and-white panel in the `GDEM0213B74` family, 122×250 native pixels. The firmware source and PlatformIO project are in `firmware/epaper-esp32/`; its display pin mapping follows the Waveshare ESP32 Driver Board and the GxEPD2 Waveshare example. Build and upload it from a machine with PlatformIO:
+
+```bash
+cd firmware/epaper-esp32
+pio run
+pio run --target upload --upload-port /dev/ttyACM0
+```
+
+On the Pi, the board normally appears as `/dev/ttyACM0` (CH343 USB serial). If automatic bootloader entry does not work, hold BOOT while the upload begins. The Pi service is `codex-companion-epaper.service`.
 
 The Pi service listens only on `127.0.0.1:4173`; Chromium accesses it locally. The bridge connection leaves the Pi and therefore requires the strong bearer token.
 
