@@ -20,6 +20,14 @@ async function openSerial() {
   serial = await open(devicePath, "r+");
   // Opening a USB serial handle can toggle DTR and reset the ESP32.
   await new Promise((resolve) => setTimeout(resolve, 1_200));
+  // Discard READY/ERR lines left by an earlier renderer instance. Only
+  // responses observed after this point belong to the frame being sent.
+  const staleBuffer = Buffer.alloc(256);
+  const drainDeadline = Date.now() + 500;
+  while (Date.now() < drainDeadline) {
+    const result = await serial.read(staleBuffer, 0, staleBuffer.length, null);
+    if (result.bytesRead === 0) break;
+  }
   return serial;
 }
 
