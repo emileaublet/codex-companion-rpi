@@ -56,13 +56,15 @@ const GLYPHS = {
 
 class Bitmap {
   constructor() {
-    this.data = Buffer.alloc(EPAPER_PLANE_BYTES);
+    // The confirmed Waveshare 2.13 B V4 protocol is active-low: 0 means an
+    // ink pixel and 1 means an untouched/white pixel.
+    this.data = Buffer.alloc(EPAPER_PLANE_BYTES, 0xff);
   }
 
   set(x, y, enabled = true) {
     if (x < 0 || x >= EPAPER_WIDTH || y < 0 || y >= EPAPER_HEIGHT || !enabled) return;
     const offset = y * EPAPER_BYTES_PER_ROW + Math.floor(x / 8);
-    this.data[offset] |= 0x80 >> (x % 8);
+    this.data[offset] &= ~(0x80 >> (x % 8));
   }
 
   line(x, y, width, height = 1) {
@@ -133,8 +135,8 @@ export function renderEpaperFrame(payload, now = Date.now()) {
 
   bitmap.line(7, 230, 108);
   bitmap.text("LOCAL / READ ONLY", 9, 237, 1, 18);
-  // The confirmed 2.13 B V4 panel uses two 1-bit planes: black followed by
-  // the color plane. The controller expects 128 pixels per row, so each
+  // The confirmed 2.13 B V4 panel uses two active-low 1-bit planes: black
+  // followed by yellow. The controller expects 128 pixels per row, so each
   // 122-pixel row is already padded by the 16-byte bitmap stride.
   return Buffer.concat([bitmap.data, color.data]);
 }
